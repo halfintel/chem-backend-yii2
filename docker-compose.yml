@@ -1,0 +1,24 @@
+version: '2'
+services:
+  php:
+    image: yiisoftware/yii2-php:7.4-apache
+    volumes:
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      - ./:/app:delegated
+    ports:
+      - '8000:80'
+  db:
+    image: mysql:8.0
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=chem-backend-yii2
+      - MYSQL_ROOT_PASSWORD=1234
+    ports:
+      - '3306:3306'
+    volumes:
+      - db:/var/lib/mysql
+volumes:
+  db:
+    driver: local
