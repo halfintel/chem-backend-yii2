@@ -9,22 +9,39 @@ $config = [
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm' => '@vendor/npm-asset',
     ],
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'y0m_04CmvWnHwYZIi8Xxvv2zSpe5XIlL',
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ]
+        ],
+        'response' => [
+            'format' => yii\web\Response::FORMAT_JSON,
+            'charset' => 'UTF-8',
+            'on beforeSend' => function ($event) {
+                $response = $event->sender;
+                $message = $response->data;
+                if (!$response->isSuccessful) {
+                    $message = $response->data['message'];
+                }
+                $response->data = [
+                    'success' => $response->isSuccessful,
+                    'message' => $message
+                ];
+            },
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
             'identityClass' => 'app\models\User',
+            'enableSession' => false,
+            'loginUrl' => null,
             'enableAutoLogin' => true,
-        ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
@@ -43,15 +60,22 @@ $config = [
             ],
         ],
         'db' => $db,
-        
+
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'enableStrictParsing' => true,
             'rules' => [
-                'GET v1/example' => 'site/example',
+                'GET v1/ping' => 'user/ping',
+                'POST v1/registration' => 'user/registration',
+                'POST v1/login' => 'user/login',
+                'POST v1/logout' => 'user/logout',
+                'POST v1/forgot-password' => 'user/forgot-password',
+                'POST v1/change-password/<token:\w+>' => 'user/change-password',
+                //'debug/<controller>/<action>' => 'debug/<controller>/<action>',
             ],
         ],
-        
+
     ],
     'params' => $params,
 ];

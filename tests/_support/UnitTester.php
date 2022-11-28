@@ -15,12 +15,24 @@
  * @method \Codeception\Lib\Friend haveFriend($name, $actorClass = NULL)
  *
  * @SuppressWarnings(PHPMD)
-*/
+ */
 class UnitTester extends \Codeception\Actor
 {
     use _generated\UnitTesterActions;
 
-   /**
-    * Define custom actions here
-    */
+
+    /**
+     * @param mixed $function
+     * @param string $exceptionMessage
+     * @return void
+     */
+    public static function expectExMessage(mixed $function, string $exceptionMessage): void
+    {
+        try {
+            $function();
+            expect_not('No exceptions');
+        } catch (\Exception $e) {
+            expect_that($e->getMessage() === $exceptionMessage);
+        }
+    }
 }

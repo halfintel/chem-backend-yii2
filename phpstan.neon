@@ -1,0 +1,17 @@
+parameters:
+    level: 9
+    scanDirectories:
+        - models
+        - controllers
+        - tests
+        - interfaces
+        - vendor/yiisoft
+    paths:
+        - controllers
+        - models
+        - tests/api
+        - tests/unit
+    ignoreErrors:
+        - '#Call to an undefined method yii#'
+        - '#Access to an undefined property yii#'
+        - '#::rules\(\)#'
