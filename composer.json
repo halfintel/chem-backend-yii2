@@ -1,7 +1,12 @@
 {
     "name": "yiisoft/yii2-app-basic",
     "description": "Yii 2 Basic Project Template",
-    "keywords": ["yii2", "framework", "basic", "project template"],
+    "keywords": [
+        "yii2",
+        "framework",
+        "basic",
+        "project template"
+    ],
     "homepage": "http://www.yiiframework.com/",
     "type": "project",
     "license": "BSD-3-Clause",
@@ -14,7 +19,7 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "php": ">=5.6.0",
+        "php": ">=8",
         "yiisoft/yii2": "~2.0.14",
         "yiisoft/yii2-bootstrap4": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0"
@@ -29,7 +34,9 @@
         "symfony/browser-kit": ">=2.7 <=4.2.4",
         "codeception/module-filesystem": "^1.0.0",
         "codeception/module-yii2": "^1.0.0",
-        "codeception/module-asserts": "^1.0.0"
+        "codeception/module-asserts": "^1.0.0",
+        "codeception/module-rest": "^2.0",
+        "phpstan/phpstan": "^1.9"
     },
     "config": {
         "process-timeout": 1800,
@@ -41,12 +48,28 @@
         }
     },
     "scripts": {
-        "post-install-cmd": [
-            "yii\\composer\\Installer::postInstall"
+        "first-start": [
+            "docker-compose up -d",
+            "docker exec -i chem-backend-yii2-php-1 pecl install pcov",
+            "docker exec -i chem-backend-yii2-php-1 docker-php-ext-enable pcov"
         ],
-        "post-create-project-cmd": [
-            "yii\\composer\\Installer::postCreateProject",
-            "yii\\composer\\Installer::postInstall"
+        "stan": [
+            "./vendor/bin/phpstan analyze -c phpstan.neon -a vendor/yiisoft/yii2/yii.php"
+        ],
+        "test": [
+            "composer migrate-fresh",
+            "docker exec -i chem-backend-yii2-php-1 php vendor/bin/codecept run --fail-fast --coverage --coverage-html"
+        ],
+        "migrate-up": [
+            "docker exec -i chem-backend-yii2-php-1 php yii migrate/up --interactive=0",
+            "docker exec -i chem-backend-yii2-php-1 php yii migrate/up --interactive=0 --appconfig=config/test_console.php"
+        ],
+        "migrate-down": [
+            "docker exec -i chem-backend-yii2-php-1 php yii migrate/down 1 --interactive=0",
+            "docker exec -i chem-backend-yii2-php-1 php yii migrate/down 1 --interactive=0 --appconfig=config/test_console.php"
+        ],
+        "migrate-fresh": [
+            "docker exec -i chem-backend-yii2-php-1 php yii migrate/fresh --interactive=0 --appconfig=config/test_console.php"
         ]
     },
     "extra": {
